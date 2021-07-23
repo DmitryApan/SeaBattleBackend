@@ -15,7 +15,7 @@ const client = redis.createClient({
 	password: '2ggRuP6nhhC1hygn5EEa6hz0DtlIoiqR'
 })
 
-const port = process.env.port || 8888
+const PORT = process.env.PORT || 8888
 
 client.on('error', err => {
 	console.log('Error redis: ' + err);
@@ -460,8 +460,8 @@ app.delete('/battles/me', function(req, res) {
 	``
 })
 
-app.listen(port, function () {
-	console.log(`Server listens port: ${port}`)
+app.listen(PORT, function () {
+	console.log(`Server listens port: ${PORT}`)
 })
 
 mongoose.set('useFindAndModify', false);
