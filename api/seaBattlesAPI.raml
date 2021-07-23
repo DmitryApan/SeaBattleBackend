@@ -1,0 +1,766 @@
+#%RAML 1.0
+title: SeaBattles API documentation
+version: 1.0
+baseUri: http://localhost.com/api/1.0
+uses:
+  assets: types.raml
+documentation:
+  - title: Welcome
+    content: |
+      Welcome to the SeaBattles API Documentation. 
+
+/auth: # optional resource
+  description: This is the top level description for /auth
+  /me:
+    get: # HTTP method declaration
+      description: Method for get is the user logged in
+      responses: # declare a response
+        200: # HTTP status code
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: # declare content of response
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if user is authenticated then data contains all this properties
+                  type: object
+                  properties: 
+                    id:
+                      description: logged user id 
+                      type: string
+                      required: false
+                    email:
+                      description: user email
+                      type: string
+                      required: false
+                    name: 
+                      description: logged user name
+                      type: string
+                      required: false
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+              examples:
+                if user is autorized: 
+                  {
+                    data: {
+                      id: "21321afda1384a846a64",
+                      login: "user",
+                      email: "example@example.com"
+                    },
+                    resultCode: 0,
+                    messages: []
+                  }
+                if user is not autorized:
+                  {
+                    data: {},
+                    resultCode: 1,
+                    messages: ["You are not authorized"]
+                  }
+  /login:
+    post:
+      description: Method for login users
+      body: 
+        application/json:
+          type: object
+          properties: 
+            email:
+              description: user email for login
+              type: string
+            password:
+              description: user password for login
+              type: string
+            rememberMe: 
+              description: if true, then session will not be expired after session finishing
+              type: boolean
+              required: false
+      responses: # declare a response
+        200: # HTTP status code
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: # declare content of response
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if user is login then data contains some properties
+                  type: object
+                  properties: 
+                    id:
+                      description: logged user id 
+                      type: string
+                      required: false
+                    email:
+                      description: user email
+                      type: string
+                      required: false
+                    name: 
+                      description: logged user name
+                      type: string
+                      required: false
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+  /logout:
+    get:
+      description: Method for logout autorized user
+      responses:
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body:
+            application/json:
+              type: object
+              properties: 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string        
+  /register:
+    post:
+      description: Method for register new users  
+      body: 
+        application/json:
+          type: object
+          properties: 
+            email:
+              description: user email for register
+              type: string
+            password:
+              description: user password for register
+              type: string
+            rememberMe: 
+              description: if true, then session will not be expired after session finishing
+              type: boolean
+              required: false
+      responses: # declare a response
+        200: # HTTP status code
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: # declare content of response
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if user is registered then data contains some properties
+                  type: object
+                  properties: 
+                    id:
+                      description: logged user id 
+                      type: string
+                      required: false
+                    email:
+                      description: user email
+                      type: string
+                      required: false
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string        
+
+/profile: 
+  description: This is the top level description for /profile
+  /me:
+    get:
+      description: Method for get information about authorize user
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if user is authenticated then data contains all this properties
+                  type: object
+                  properties: 
+                    id:
+                      description: logged user id 
+                      type: string
+                      required: false
+                    email:
+                      description: logged user email
+                      type: string
+                      required: false
+                    name: 
+                      description: logged user name
+                      type: string
+                      required: false
+                    urlAvatar:
+                      description: logged url user avatar
+                      type: string
+                      required: false
+                    isBattle:
+                      description: '**true** if logged user in battle, otherwise **false**'
+                      type: boolean
+                      required: false
+                    numBattles: 
+                      description: logged user number of battles fought
+                      type: number
+                      required: false
+                    numVictories: 
+                      description: logged user number of victories
+                      type: number
+                      required: false 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+              examples:
+                if user is autorized: 
+                  {
+                    data: {
+                      id: "21321afda1384a846a64",
+                      name: "user",
+                      email: "example@example.com",
+                      urlAvatar: "http://example.com/image.png",
+                      isBattle: false,
+                      numBattles: 10,
+                      numVictories: 3
+                    },
+                    resultCode: 0,
+                    messages: []
+                  }
+                if user is not autorized:
+                  {
+                    data: {},
+                    resultCode: 1,
+                    messages: ["You are not authorized"]
+                  }
+    post:
+      description: Method for set profile info authorize user
+      body: 
+        application/json:
+          type: object
+          properties: 
+            name:
+              description: user name for set in profile
+              type: string
+              required: false
+            urlAvatar: 
+              description: user avatar for set in profile
+              type: string
+              required: false
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if set profile info is successful then data contains all this properties
+                  type: object
+                  properties: 
+                    id:
+                      description: logged user id 
+                      type: string
+                      required: false
+                    name: 
+                      description: logged user name
+                      type: string
+                      required: false
+                    urlAvatar:
+                      description: logged url user avatar
+                      type: string
+                      required: false                    
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+
+  /{userId}:
+    get:
+      description: Method for get information about other usesrs
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              type: object
+              properties: 
+                data:
+                  description: if user was fined then data contains all this properties
+                  type: object
+                  properties: 
+                    id:
+                      description: finded user id 
+                      type: string
+                      required: false
+                    email:
+                      description: finded user email
+                      type: string
+                      required: false
+                    name: 
+                      description: finded user name
+                      type: string
+                      required: false
+                    urlAvatar:
+                      description: finded url user avatar
+                      type: string
+                      required: false
+                    isBattle:
+                      description: '**true** if finded user in battle, otherwise **false**'
+                      type: boolean
+                      required: false
+                    numBattles: 
+                      description: finded user number of battles fought
+                      type: number
+                      required: false
+                    numVictories: 
+                      description: finded user number of victories
+                      type: number
+                      required: false 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+
+/battles: # optional resource
+  description: This is the top level description for /battles
+  get:
+    description: Method for get battles
+    queryParameters: 
+      count:
+        type: "integer - default: 10 - max: 100"
+        description: page size (how many battles will be returned in response)
+        required: false
+      page:
+        type: "integer - default: 1"
+        description: number of portion of items
+        required: false
+    responses: 
+      200:
+        description: successful operation
+        headers: 
+          Content-Type: application/json                                            
+        body: 
+          application/json:
+            properties:
+              data:
+                type: object
+                description: will contain all properties if the request was successful
+                properties:
+                  totalCount:
+                    type: integer
+                    description: total amount of created battles
+                    required: false
+                  battles:
+                    type: assets.Battle[]
+                    required: false
+              resultCode:
+                description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                type: number
+              messages:
+                description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                type: array of string
+                  
+  post:
+    description: Method for create new battle
+    body: 
+      application/json:
+        type: object
+        properties: 
+          type: 
+            description: "type battle (**normal** or **random** - default: **normal**)"
+            type: string
+            required: false 
+          maxParticipants:
+            description: "(default: 2 - max: 20)"
+            type: integer
+            required: false
+          battlefieldSize:
+            description: "(default: 10 - max: 15)"
+            type: integer
+            required: false
+          description:
+            type: string
+            required: false
+    responses: 
+      200:
+        description: successful operation
+        headers: 
+          Content-Type: application/json
+        body: 
+          application/json:
+            properties:
+              data:
+                type: assets.Battle
+                description: will contain all properties if the request was successful
+              resultCode:
+                description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                type: number
+              messages:
+                description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                type: array of string    
+
+  /me:
+    description: Endpoint for logged in user
+    get:
+      description: Method for get info current battle
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              properties:
+                data:
+                  description: will contain all properties if the request was successful
+                  type: assets.Battle
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+    delete: 
+      description: Method for cancel current battle
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              properties:
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+  /{battleId}:
+    description: Endpoint for operations with battles by id
+    get:
+      description: Method for get battle info
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json                                            
+          body: 
+            application/json:
+              properties:
+                data:
+                  description: will contain all properties if the request was successful
+                  type: assets.Battle
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
+    post:
+      description: Method for join battle
+      body: 
+        application/json:
+          type: object
+          properties: 
+            side: 
+              description: side you are joining (**red** or **green** only for not randomize type battle)
+              type: string
+              required: false
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type: application/json
+          body: 
+            application/json:
+              properties:
+                data:
+                  type: assets.Battle
+                  description: will contain all properties if the request was successful
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string    
+/fields: # optional resource
+  description: This is the top level description for /fields
+  /me:
+    description: Endpoint for logged in user
+    get:
+      description: Method for get field info
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type:
+          body: 
+            application/json:
+              properties: 
+                data:
+                  type: object
+                  description: will contain all properties if the request was successful
+                  properties: 
+                    status:
+                      type: integer
+                      description: "status of the battlefield (**0** - placement of ships **1** - waiting for a move from the field, **2** - the field made a move, **3** - the field was defeated, **4** - the field won in the general battle, **5** - the field lost, **6** - draw, **7** - fight canceled)"
+                    side:
+                      type: integer
+                      description: (**0** - green, **1** - red)
+                    idBattle:
+                      type: string
+                      description: id battle
+                    userId:
+                      type: string
+                      description: user id 
+                    field:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about the placement of ships (**0** - empty field, **1** - single-storey, **2** - two-storey, **3** - three-storey, **4** - four-storey)   
+                      example: |
+                        [1,0,0,0,0,0,4,4,4,4]
+                        [0,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,3,3,3,0,0,0]
+                        [0,0,0,0,0,0,0,0,1,0]
+                        [0,0,0,0,0,2,2,0,0,0]
+                        [0,0,0,0,0,0,0,0,0,0]
+                        [0,2,2,0,0,0,0,0,0,0]
+                        [3,0,0,0,2,2,0,0,0,0]
+                        [3,0,0,0,0,0,0,0,1,0]
+                        [3,0,0,0,0,0,0,0,0,0]
+                    fieldStatus:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about status field (**0** - no shot was fired, **1** - a shot was fired)  
+                      example: |
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,1,1,0]
+                        [1,0,0,0,0,0,0,0,1,0]
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,0,0,0]
+                        [1,0,0,0,0,0,0,0,1,0]
+                        [1,0,0,0,0,0,0,0,0,0]                                 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string                       
+    post:
+      description: Method for placing ships
+      body: 
+        application/json:
+          type: object
+          properties: 
+            coordinates: 
+              description: coordinates of the place of installation of the ship (**[x, y]**)
+              type: array of integer
+            rotation:
+              type: integer
+              description: rotation (**0** - horizontal, **1** - vertical)
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type:
+          body: 
+            application/json:
+              properties: 
+                data:
+                  type: object
+                  description: will contain all properties if the request was successful
+                  properties: 
+                    status:
+                      type: integer
+                      description: "status of the battlefield (**0** - placement of ships **1** - waiting for a move from the field, **2** - the field made a move, **3** - the field was defeated, **4** - the field won in the general battle, **5** - the field lost, **6** - draw, **7** - fight canceled)"
+                    side:
+                      type: integer
+                      description: (**0** - green, **1** - red)
+                    idBattle:
+                      type: string
+                      description: id battle
+                    userId:
+                      type: string
+                      description: user id 
+                    field:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about the placement of ships (**0** - empty field, **1** - single-storey, **2** - two-storey, **3** - three-storey, **4** - four-storey)   
+                    fieldStatus:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about status field (**0** - no shot was fired, **1** - a shot was fired)  
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string  
+    delete:
+      description: Method for delete ships
+      body: 
+        application/json:
+          type: object
+          properties: 
+            coordinates: 
+              description: coordinates of the place of delete of the ship (**[x, y]**)
+              type: array of integer
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type:
+          body: 
+            application/json:
+              properties: 
+                data:
+                  type: object
+                  description: will contain all properties if the request was successful
+                  properties: 
+                    status:
+                      type: integer
+                      description: "status of the battlefield (**0** - placement of ships **1** - waiting for a move from the field, **2** - the field made a move, **3** - the field was defeated, **4** - the field won in the general battle, **5** - the field lost, **6** - draw, **7** - fight canceled)"
+                    side:
+                      type: integer
+                      description: (**0** - green, **1** - red)
+                    idBattle:
+                      type: string
+                      description: id battle
+                    userId:
+                      type: string
+                      description: user id 
+                    field:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about the placement of ships (**0** - empty field, **1** - single-storey, **2** - two-storey, **3** - three-storey, **4** - four-storey)   
+                    fieldStatus:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about status field (**0** - no shot was fired, **1** - a shot was fired)                                                      
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string 
+  /{userId}:
+    description: Endpoint for operations with field by id
+    get:
+      description: Method for get field info
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type:
+          body: 
+            application/json:
+              properties: 
+                data:
+                  type: object
+                  description: will contain all properties if the request was successful
+                  properties: 
+                    status:
+                      type: integer
+                      description: "status of the battlefield (**0** - placement of ships **1** - waiting for a move from the field, **2** - the field made a move, **3** - the field was defeated, **4** - the field won in the general battle, **5** - the field lost, **6** - draw, **7** - fight canceled)"
+                    side:
+                      type: integer
+                      description: (**0** - green, **1** - red)
+                    idBattle:
+                      type: string
+                      description: id battle
+                    userId:
+                      type: string
+                      description: user id 
+                    fieldTarget:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about the field target(**0** - unknown, **1** - affected monotonous, **2** - affected two-story, **3** - affected three-story, **4** - affected four-story, **5** - partial defeat, **6** - miss)   
+                      example: |
+                        [1,0,0,0,0,0,5,5,5,0]
+                        [6,0,0,6,0,0,0,0,0,0]
+                        [1,0,0,6,5,5,0,0,0,0]
+                        [0,0,0,6,6,0,0,0,1,0]
+                        [0,0,0,0,0,2,2,0,0,0]
+                        [0,0,0,0,0,6,0,0,0,0]
+                        [0,2,2,0,0,0,0,0,0,0]
+                        [3,0,0,0,2,2,0,0,0,0]
+                        [3,0,0,0,0,0,0,0,0,0]
+                        [3,0,0,0,0,0,0,0,0,0]                                 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string  
+    post:
+      description: Method for shot 
+      body: 
+        application/json:
+          type: object
+          properties: 
+            coordinates: 
+              description: coordinates of the place of shot of the ship (**[x, y]**)
+              type: array of integer
+      responses: 
+        200:
+          description: successful operation
+          headers: 
+            Content-Type:
+          body: 
+            application/json:
+              properties: 
+                data:
+                  type: object
+                  description: will contain all properties if the request was successful
+                  properties: 
+                    status:
+                      type: integer
+                      description: "status of the battlefield (**0** - placement of ships **1** - waiting for a move from the field, **2** - the field made a move, **3** - the field was defeated, **4** - the field won in the general battle, **5** - the field lost, **6** - draw, **7** - fight canceled)"
+                    side:
+                      type: integer
+                      description: (**0** - green, **1** - red)
+                    idBattle:
+                      type: string
+                      description: id battle
+                    userId:
+                      type: string
+                      description: user id 
+                    fieldTarget:
+                      type: two-dimensional array of integer
+                      description: two-dimensional array contains information about the field target(**0** - unknown, **1** - affected monotonous, **2** - affected two-story, **3** - affected three-story, **4** - affected four-story, **5** - partial defeat, **6** - miss)   
+                      example: |
+                        [1,0,0,0,0,0,5,5,5,0]
+                        [6,0,0,6,0,0,0,0,0,0]
+                        [1,0,0,6,5,5,0,0,0,0]
+                        [0,0,0,6,6,0,0,0,1,0]
+                        [0,0,0,0,0,2,2,0,0,0]
+                        [0,0,0,0,0,6,0,0,0,0]
+                        [0,2,2,0,0,0,0,0,0,0]
+                        [3,0,0,0,2,2,0,0,0,0]
+                        [3,0,0,0,0,0,0,0,0,0]
+                        [3,0,0,0,0,0,0,0,0,0]                                 
+                resultCode:
+                  description: (**0** if opearation completed successfullt, other numbers - some error occured)
+                  type: number
+                messages:
+                  description: is empty if resultCode is 0, contains error messages if resultCode is different from 0
+                  type: array of string
