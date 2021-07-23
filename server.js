@@ -15,7 +15,7 @@ const client = redis.createClient({
 	password: '2ggRuP6nhhC1hygn5EEa6hz0DtlIoiqR'
 })
 
-const PORT = process.env.PORT || 8888
+const PORT = process.env.PORT || 5000
 
 client.on('error', err => {
 	console.log('Error redis: ' + err);
