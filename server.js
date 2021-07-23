@@ -73,7 +73,7 @@ passport.deserializeUser(function (id, done) {
 })
 
 app.get('/api', function(req, res) {
-	res.sendFile('/api/seaBattlesAPI.html')
+	res.sendFile(process.env.PWD + '/api/seaBattlesAPI.html')
 })
 
 app.get('/auth/me', function (req, res) {
