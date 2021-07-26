@@ -9,6 +9,8 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 const cors = require('cors')
 const flash = require('connect-flash')
 
+import {shuffle} from './logic.js'
+
 const client = redis.createClient({
 	host: 'redis-12791.c92.us-east-1-3.ec2.cloud.redislabs.com',
 	port: 12791,
@@ -23,7 +25,7 @@ client.on('error', err => {
 
 const app = express()
 
-app.use(cors())
+app.use(cors({credentials: true}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
@@ -354,7 +356,7 @@ app.get('/battles', function (req, res) {
 			}
 		}
 
-		Battle.paginate({}, optionsPaginate, function(err, {battles, totalCount}) {
+		Battle.paginate({status: 0}, optionsPaginate, function(err, {battles, totalCount}) {
 			if (err) {
 				res.send({
 					data: {},
@@ -382,12 +384,39 @@ app.get('/battles', function (req, res) {
 })
 
 app.post('/battles', function(req, res) {
+
 	const {user, body} = req
 	const {type, maxParticipants, battlefieldSize, description} = body
 
 	if (user) {
 		let useType = 0, useMaxParticipants = 2, useBattlefieldSize = 10, useDescription = 'Battle'
 		
+		Battle.find({
+			userId: user._id,
+			status: {$lte: 1}
+		}, function(err, battles) {
+
+			if (battles) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: ['Battles exists']
+				})
+	
+				return
+			}
+	
+			if (err) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: [err]
+				})
+	
+				return
+			}
+		})
+
 		if (type && (type == 0 || type == 1)) {
 			useType = type
 		}
@@ -435,8 +464,13 @@ app.post('/battles', function(req, res) {
 })
 
 app.get('/battles/me', function(req, res) {
+	const {user} = req
+
 	if (user) {
-		Battle.findOne({userId: user._id}, function(err, battle) {
+		Battle.findOne({
+			userId: user._id,
+			status: {$lte: 1}
+		}, function(err, battle) {
 			if (err) {
 				res.send({
 					data: {},
@@ -461,7 +495,198 @@ app.get('/battles/me', function(req, res) {
 })
 
 app.delete('/battles/me', function(req, res) {
-	``
+	const {user} = req
+	
+	if (user) {
+		Battles.updateOne({
+			userId: user._id,
+			status: {$lte: 1}
+		}, {
+			$set: {status: 5}
+		}, function(err, res) {
+			if (err) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: [err]
+				})
+			} else {
+				res.send({
+					resultCode: 0,
+					messages: []
+				})
+			}
+		})
+	} else {
+		res.send({
+			data: {},
+			resultCode: 1,
+			messages: ['You are not authorized']
+		})
+	}
+})
+
+app.get('/battles/:battleId', function(req, res) {
+	const {user} = req
+	const battleId = req.params['battleId']
+	
+	if (user) {
+		Battle.findOne({battleId}, function(err, battle) {
+			if (err) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: [err]
+				})
+			} else {
+				if (battle) {
+					res.send({
+						data: battle,
+						resultCode: 0,
+						messages: []
+					})
+				} else {
+					res.send({
+						data: {},
+						resultCode: 1,
+						messages: ['Battle is not found']
+					})
+				}				
+			}
+		})
+	} else {
+		res.send({
+			data: {},
+			resultCode: 1,
+			messages: ['You are not authorized']
+		})
+	}
+})
+
+app.post('/battles/:battleId', function(req, res) {
+	const {user, boby} = req
+	const {battleId} = req.params['battleId']
+	const {side} = boby
+
+	if (user) {
+		Battle.findOne({battleId, status: 0}, function(err, battle) {
+			if (err) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: [err]
+				})
+			} else {
+				if (battle) {
+					const {type, greenIds, maxParticipants, battlefieldSize} = battle
+
+					if (type == 'random') {
+						if (greenIds.length + 1 < maxParticipants) {
+							Battle.updateOne({battleId}, {$set: {
+									greenIds: [...greenIds, user._id]
+							}}, function(err, res) {
+								if (err) {
+									res.send({
+										data: {},
+										resultCode: 1,
+										messages: [err]
+									})
+								} else {
+									res.send({
+										data: {...battle, greenIds: [...greenIds, user._id]},
+										resultCode: 0,
+										messages: []
+									})
+								}
+							})
+
+						} else {
+							const randomIds = shuffle([...greenIds, user._id])
+							const newGreenIds = randomIds.slice(0, Math.floor(maxParticipants / 2))
+							const newRedIds = randomIds.slice(Math.floor(maxParticipants / 2))
+							const newGreenStatuses = Array.from(Array(newGreenIds.length), () => 0)
+							const newRedStatuses = Array.from(Array(newRedIds.length), () => 0)												
+							const fieldsGreen = newGreenIds.map((id) => ({
+								status: 0,
+								side: 0,
+								battleId,
+								userId: id,
+								field: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0)),
+								fieldStatus: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0)),
+								fieldTarget: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0))
+							}))
+							const fieldsRed = newRedIds.map((id) => ({
+								status: 0,
+								side: 0,
+								battleId,
+								userId: id,
+								field: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0)),
+								fieldStatus: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0)),
+								fieldTarget: Array.from(Array(battlefieldSize), () => Array.from(Array(battlefieldSize), () => 0))
+							}))
+
+							Field.insertMany([...fieldsGreen, ...fieldsRed], function(err, res) {
+								if (err) {
+									res.send({
+										data: {},
+										resultCode: 1,
+										messages: [err]
+									})
+								} else {
+									Battle.updateOne({battleId}, {$set: {
+										greenIds: newGreenIds,
+										redIds: newRedIds,
+										greenStatuses: newGreenStatuses,
+										redStatuses: newRedStatuses,
+										status: 1
+									}}, function(err, res) {
+										if (err) {
+											res.send({
+												data: {},
+												resultCode: 1,
+												messages: [err]
+											})
+										} else {
+											res.send({
+												data: {
+													...battle, 
+													greenIds: newGreenIds,
+													redIds: newRedIds,
+													greenStatuses: newGreenStatuses,
+													redStatuses: newRedStatuses,
+													status: 1
+												},
+												resultCode: 0,
+												messages: []
+											})
+										}
+									})
+								}
+							})
+						}
+					} else {
+						if (!side || (side != 0 && side != 1)) {
+							side = 0
+						}
+
+
+					}
+				} else {
+					res.send({
+						data: {},
+						resultCode: 1,
+						messages: ['Unable to join the battle']
+					})
+				}
+			}
+		})
+	} else {
+		res.send({
+			data: {},
+			resultCode: 1,
+			messages: ['You are not authorized']
+		})
+	}
 })
 
 app.listen(PORT, function () {
@@ -527,6 +752,29 @@ const battleSchema = new mongoose.Schema({
 })
 battleSchema.plugin(mongoosePaginate)
 const Battle = mongoose.model('Battle', battleSchema)
+
+const fieldSchema = new mongoose.Schema({
+	status: {
+		type: Number,
+		default: 0
+	},
+	side: Number,
+	battleId: String,
+	userId: String,
+	field: {
+		type: [Number],
+		default: []
+	},
+	fieldStatus: {
+		type: [Number],
+		default: []
+	},
+	fieldTarget: {
+		type: [Number],
+		default: []
+	}
+})
+const Field = mongoose.model('Field', fieldSchema)
 
 // const deviceSchema = new mongoose.Schema({
 // 	deviceId: String,
