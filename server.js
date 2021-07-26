@@ -9,7 +9,7 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 const cors = require('cors')
 const flash = require('connect-flash')
 
-import {shuffle} from './logic.js'
+import {shuffle} from `${process.env.PWD} /logic.js`
 
 const client = redis.createClient({
 	host: 'redis-12791.c92.us-east-1-3.ec2.cloud.redislabs.com',
