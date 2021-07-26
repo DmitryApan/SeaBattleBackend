@@ -9,7 +9,7 @@ const mongoosePaginate = require('mongoose-paginate-v2')
 const cors = require('cors')
 const flash = require('connect-flash')
 
-import {shuffle} from `${process.env.PWD}/logic.js`
+//import {shuffle} from `${process.env.PWD}/logic.js`
 
 const client = redis.createClient({
 	host: 'redis-12791.c92.us-east-1-3.ec2.cloud.redislabs.com',
@@ -601,8 +601,8 @@ app.post('/battles/:battleId', function(req, res) {
 							})
 
 						} else {
-							const randomIds = shuffle([...greenIds, user._id])
-							//const randomIds = []
+							//const randomIds = shuffle([...greenIds, user._id])
+							const randomIds = []
 							const newGreenIds = randomIds.slice(0, Math.floor(maxParticipants / 2))
 							const newRedIds = randomIds.slice(Math.floor(maxParticipants / 2))
 							const newGreenStatuses = Array.from(Array(newGreenIds.length), () => 0)
