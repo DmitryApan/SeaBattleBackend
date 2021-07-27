@@ -45,7 +45,7 @@ app.use(
 			//expires: false,			
 			//sameSite: 'lax',
 			//secure: true,
-			//httpOnly: false				
+			httpOnly: false				
 		}
 	})
 )
