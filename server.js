@@ -28,7 +28,8 @@ app.set('trust proxy', 1)
 
 app.use(cors({
 	credentials: true,
-	origin: 'https://seabattles.herokuapp.com'
+	//origin: 'https://seabattles.herokuapp.com'
+	origin: 'http://localhost:3000'
 	
 }))
 app.use(express.json())
