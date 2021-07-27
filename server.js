@@ -41,12 +41,12 @@ app.use(
 		secret: 'you secret key',
 		resave: true,
 		rolling: true,
-		saveUninitialized: false,
+		saveUninitialized: true,
 		cookie: {
 			sameSite: 'none',
 			sameSite: 'lax',			
 			secure: true,				
-		}
+		},
 	})
 )
 app.use(flash())
