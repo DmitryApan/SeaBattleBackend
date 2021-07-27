@@ -8,6 +8,7 @@ const mongoose = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate-v2')
 const cors = require('cors')
 const flash = require('connect-flash')
+const cookieParser = require('cookie-parser')
 
 //import {shuffle} from `${process.env.PWD}/logic.js`
 
@@ -50,8 +51,7 @@ app.use(
 	})
 )
 app.use(flash())
-app.use(cookieParser());
-app.use(sessionMiddleware);
+app.use(cookieParser())
 app.use(passport.initialize())
 app.use(passport.session())
 
