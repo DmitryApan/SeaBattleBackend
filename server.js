@@ -43,8 +43,8 @@ app.use(
 		rolling: true,
 		saveUninitialized: false,
 		cookie: {
-			sameSite: 'lax',			
-			//secure: true,				
+			sameSite: 'none',			
+			secure: true,				
 		}
 	})
 )
