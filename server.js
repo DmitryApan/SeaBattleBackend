@@ -28,9 +28,7 @@ app.set('trust proxy', 1)
 
 app.use(cors({
 	credentials: true,
-	//origin: 'https://seabattles.herokuapp.com'
-	origin: 'http://localhost:3000'
-	
+	origin: 'http://localhost:3000'	
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -40,13 +38,12 @@ app.use(
 		store: new redisStorage({
 			client: client,
 		}),
-		secret: 'process.env.SESSION_SECRET',
+		secret: 'hgkhgsd5fs351fs53fd1s',
 		resave: true,
 		rolling: true,
 		saveUninitialized: false,
 		cookie: {
 			sameSite: 'none',
-			//sameSite: 'lax',			
 			secure: true,				
 		},
 	})
@@ -88,7 +85,7 @@ app.get('/api', function(req, res) {
 })
 
 app.get('/auth/me', function (req, res) {
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
+	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
 
 	const { user } = req
 
@@ -113,8 +110,8 @@ app.get('/auth/me', function (req, res) {
 
 app.post('/auth/login', function (req, res) {
 
-	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
-	res.header("Access-Control-Max-Age", "300")
+	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
+	//res.header("Access-Control-Max-Age", "300")
 
 	if (req.body.rememberMe) {
 		req.session.cookie.expires = true
