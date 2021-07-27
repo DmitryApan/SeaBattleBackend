@@ -24,6 +24,7 @@ client.on('error', err => {
 })
 
 const app = express()
+app.set('trust proxy', 1)
 
 app.use(cors({
 	credentials: true,
@@ -38,13 +39,13 @@ app.use(
 		store: new redisStorage({
 			client: client,
 		}),
-		secret: 'you secret key',
+		secret: process.env.SESSION_SECRET,
 		resave: true,
 		rolling: true,
-		saveUninitialized: true,
+		saveUninitialized: false,
 		cookie: {
 			sameSite: 'none',
-			sameSite: 'lax',			
+			//sameSite: 'lax',			
 			secure: true,				
 		},
 	})
