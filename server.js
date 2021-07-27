@@ -27,7 +27,7 @@ const app = express()
 
 app.use(cors({
 	credentials: true,
-	origin: 'https://seabattles.herokuapp.com'
+	//origin: 'https://seabattles.herokuapp.com'
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -43,7 +43,7 @@ app.use(
 		cookie: {
 			//expires: false,
 			sameSite: 'none',
-			secure: false			
+			secure: true			
 		}
 	})
 )
