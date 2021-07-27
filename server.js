@@ -39,7 +39,7 @@ app.use(
 		store: new redisStorage({
 			client: client,
 		}),
-		secret: process.env.SESSION_SECRET,
+		secret: 'process.env.SESSION_SECRET',
 		resave: true,
 		rolling: true,
 		saveUninitialized: false,
