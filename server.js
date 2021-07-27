@@ -85,8 +85,6 @@ app.get('/api', function(req, res) {
 })
 
 app.get('/auth/me', function (req, res) {
-	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
-
 	const { user } = req
 
 	if (user) {
@@ -109,10 +107,6 @@ app.get('/auth/me', function (req, res) {
 })
 
 app.post('/auth/login', function (req, res) {
-
-	//res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Set-Cookie")
-	//res.header("Access-Control-Max-Age", "300")
-
 	if (req.body.rememberMe) {
 		req.session.cookie.expires = true
 		req.session.cookie.maxAge = 180 * 24 * 60 * 60 * 1000
