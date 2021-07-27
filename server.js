@@ -38,7 +38,8 @@ app.use(
 			client: client,
 		}),
 		secret: 'you secret key',
-		resave: false,
+		resave: true,
+		rolling: true,
 		saveUninitialized: false,
 		cookie: {
 			//expires: false,			
@@ -49,6 +50,8 @@ app.use(
 	})
 )
 app.use(flash())
+app.use(cookieParser());
+app.use(sessionMiddleware);
 app.use(passport.initialize())
 app.use(passport.session())
 
