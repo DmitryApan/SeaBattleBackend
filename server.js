@@ -108,7 +108,7 @@ app.get('/auth/me', function (req, res) {
 
 app.post('/auth/login', function (req, res) {
 
-	res.header("Access-Control-Allow-Headers", "X-Requested-With")
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 
 	if (req.body.rememberMe) {
 		req.session.cookie.expires = true
