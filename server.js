@@ -28,6 +28,7 @@ const app = express()
 app.use(cors({
 	credentials: true,
 	origin: 'http://localhost:3000'
+	
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -42,11 +43,8 @@ app.use(
 		rolling: true,
 		saveUninitialized: false,
 		cookie: {
-			//expires: false,			
-			sameSite: 'none',
-			sameSite: 'lax',
-			secure: true,
-			//httpOnly: false				
+			sameSite: 'none',			
+			secure: true,				
 		}
 	})
 )
@@ -109,6 +107,8 @@ app.get('/auth/me', function (req, res) {
 })
 
 app.post('/auth/login', function (req, res) {
+
+	res.header("Access-Control-Allow-Headers", "X-Requested-With")
 
 	if (req.body.rememberMe) {
 		req.session.cookie.expires = true
