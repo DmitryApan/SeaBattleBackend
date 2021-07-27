@@ -27,7 +27,7 @@ const app = express()
 
 app.use(cors({
 	credentials: true,
-	origin: 'http://localhost:3000'
+	//origin: 'http://localhost:3000'
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -41,7 +41,8 @@ app.use(
 		resave: false,
 		saveUninitialized: false,
 		cookie: {
-			expires: false
+			expires: false,
+			sameSite: 'none'
 		}
 	})
 )
