@@ -138,7 +138,7 @@ app.post('/auth/login', function (req, res) {
 			}
 			return res.send({
 				data: {
-					_id: user._id,
+					id: user._id,
 					name: user.name,
 					email: user.email
 				},
