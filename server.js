@@ -43,8 +43,8 @@ app.use(
 		rolling: true,
 		saveUninitialized: false,
 		cookie: {
-			sameSite: 'none',			
-			secure: true,				
+			sameSite: 'lax',			
+			//secure: true,				
 		}
 	})
 )
@@ -85,6 +85,8 @@ app.get('/api', function(req, res) {
 })
 
 app.get('/auth/me', function (req, res) {
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+
 	const { user } = req
 
 	if (user) {
