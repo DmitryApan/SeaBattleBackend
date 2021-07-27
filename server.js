@@ -43,7 +43,7 @@ app.use(
 		saveUninitialized: false,
 		cookie: {
 			//expires: false,			
-			//sameSite: 'lax',
+			sameSite: 'lax',
 			//secure: true,
 			httpOnly: false				
 		}
