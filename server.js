@@ -43,8 +43,8 @@ app.use(
 		saveUninitialized: false,
 		cookie: {
 			//expires: false,			
-			sameSite: 'lux',
-			//secure: false,
+			sameSite: 'none',
+			secure: false,
 			httpOnly: false				
 		}
 	})
