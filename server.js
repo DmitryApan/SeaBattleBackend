@@ -154,19 +154,15 @@ app.post('/auth/login', function (req, res) {
 app.get('/auth/logout', function (req, res) {
 	req.logOut()
 	req.session.destroy(function () {
-		// res.cookie("connect.sid", "", { expires: new Date() }).send({
-		// 	resultCode: 0,
-		// 	messages: []
-	 	// })
-
-		res.send({
+		res.cookie("connect.sid", "", { 
+			expires: new Date(), 
+			sameSite: 'none',
+			secure: true,  
+		}).send({
 			resultCode: 0,
-			messages: []
-		})
-
-	})
-
-	
+		 	messages: []
+	 	})
+	})	
 })
 
 app.post('/auth/register', function (req, res) {
