@@ -160,7 +160,7 @@ app.get('/auth/logout', function (req, res) {
 	// 	})
 	// })
 
-	req.send({
+	res.send({
 		resultCode: 0,
 		messages: []
 	})
