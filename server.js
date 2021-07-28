@@ -42,7 +42,7 @@ app.use(
 		resave: true,
 		rolling: true,
 		saveUninitialized: false,
-		cookie: {
+		cookie: {			
 			sameSite: 'none',
 			secure: true,				
 		},
@@ -66,18 +66,25 @@ passport.use(new LocalStrategy(
 			if (user.password !== password) {
 				return done(null, false, { message: 'Incorrect email or password' });
 			}
-			return done(null, user);
+			return done(null, {
+				id: user._id,
+				email: user.email
+			});
 		})
 	}
 ))
 passport.serializeUser(function (user, done) {
-	done(null, user._id)
+	//done(null, user._id)
+	done(null, user);
 })
-passport.deserializeUser(function (id, done) {
-	User.findById(id, '_id email name', function (err, user) {
-		done(err, user);
-	})
+// passport.deserializeUser(function (id, done) {
+// 	User.findById(id, '_id email name', function (err, user) {
+// 		done(err, user);
+// 	})
+// })
 
+passport.deserializeUser(function (user, done) {
+	done(null, user);
 })
 
 app.get('/api', function(req, res) {
@@ -85,15 +92,11 @@ app.get('/api', function(req, res) {
 })
 
 app.get('/auth/me', function (req, res) {
-	const { user } = req
+	const {user} = req
 
 	if (user) {
 		res.send({
-			data: {
-				id: user._id,
-				name: user.name,
-				email: user.email
-			},
+			data: user,
 			resultCode: 0,
 			messages: []
 		})
@@ -107,11 +110,7 @@ app.get('/auth/me', function (req, res) {
 })
 
 app.post('/auth/login', function (req, res) {
-	if (req.body.rememberMe) {
-		req.session.cookie.expires = true
-		req.session.cookie.maxAge = 180 * 24 * 60 * 60 * 1000
-		req.session.save()
-	}
+	
 
 	passport.authenticate('local', function (err, user, info) {
 		if (err) {
@@ -136,12 +135,15 @@ app.post('/auth/login', function (req, res) {
 					messages: [err]
 				})
 			}
+			
+			if (req.body.rememberMe) {
+				req.session.cookie.expires = true
+				req.session.cookie.maxAge = 180 * 24 * 60 * 60 * 1000
+				req.session.save()
+			}
+
 			return res.send({
-				data: {
-					id: user._id,
-					name: user.name,
-					email: user.email
-				},
+				data: user,
 				resultCode: 0,
 				messages: []
 			})
@@ -151,22 +153,21 @@ app.post('/auth/login', function (req, res) {
 
 app.get('/auth/logout', function (req, res) {
 	req.logOut()
-	req.session.destroy(function () {
-		res.cookie("connect.sid", "", { expires: new Date() }).send({
-			resultCode: 0,
-			messages: []
-		})
+	// req.session.destroy(function () {
+	// 	res.cookie("connect.sid", "", { expires: new Date() }).send({
+	// 		resultCode: 0,
+	// 		messages: []
+	// 	})
+	// })
+
+	req.send({
+		resultCode: 0,
+		messages: []
 	})
 })
 
 app.post('/auth/register', function (req, res) {
-	const { email, password, rememberMe } = req.body
-
-	if (rememberMe) {
-		req.session.cookie.expires = true
-		req.session.cookie.maxAge = 180 * 24 * 60 * 60 * 1000
-		req.session.save()
-	}
+	const {email, password, rememberMe} = req.body	
 
 	if (!email || !password) {
 		res.send({
@@ -208,23 +209,32 @@ app.post('/auth/register', function (req, res) {
 					messages: [err]
 				})
 			} else {
-				req.logIn(user, function (err) {
+				req.logIn({
+					id: user._id,
+					email: user.email
+				}, function (err) {
 					if (err) {
-						res.send({
+						return res.send({
 							data: {},
 							resultCode: 1,
 							messages: [err]
 						})
-					} else {
-						res.send({
-							data: {
-								id: user._id,
-								email: user.email
-							},
-							resultCode: 0,
-							messages: []
-						})
+					} 
+					
+					if (rememberMe) {
+						req.session.cookie.expires = true
+						req.session.cookie.maxAge = 180 * 24 * 60 * 60 * 1000
+						req.session.save()
 					}
+
+					return res.send({
+						data: {
+							id: user._id,
+							email: user.email
+						},
+						resultCode: 0,
+						messages: []
+					})					
 				})
 			}
 		})
@@ -232,21 +242,31 @@ app.post('/auth/register', function (req, res) {
 })
 
 app.get('/profile/me', function (req, res) {
-	const { user } = req
+	const {user} = req
 
 	if (user) {
-		res.send({
-			data: {
-				id: user._id,
-				name: user.name,
-				avatar: user.avatar,
-				isBattle: user.isBattle,
-				numBattles: user.numBattles,
-				numVictories: user.numVictories,
-			},
-			resultCode: 0,
-			messages: []
-		})
+		User.findById(user.id, function (err, user) {
+			if (err) {
+				res.send({
+					data: {},
+					resultCode: 1,
+					messages: [err]
+				})
+			} else {
+				res.send({
+					data: {
+						id: user._id,
+						name: user.name,
+						avatar: user.avatar,
+						isBattle: user.isBattle,
+						numBattles: user.numBattles,
+						numVictories: user.numVictories,
+					},
+					resultCode: 0,
+					messages: []
+				})
+			}
+		})		
 	} else {
 		res.send({
 			data: {},
@@ -270,7 +290,7 @@ app.post('/profile/me', function (req, res) {
 	}
 
 	if (user) {
-		User.findByIdAndUpdate(user._id, { ...properties }, function (err, user) {
+		User.findByIdAndUpdate(user.id, { ...properties }, function (err, user) {
 			if (err) {
 				res.send({
 					data: {},
@@ -397,7 +417,7 @@ app.post('/battles', function(req, res) {
 		let useType = 0, useMaxParticipants = 2, useBattlefieldSize = 10, useDescription = 'Battle'
 		
 		Battle.find({
-			userId: user._id,
+			userId: user.id,
 			status: {$lte: 1}
 		}, function(err, battles) {
 
@@ -439,7 +459,7 @@ app.post('/battles', function(req, res) {
 		}
 
 		Battle.create({
-			userId: user._id,
+			userId: user.id,
 			type: useType, 
 			maxParticipants: useMaxParticipants,
 			battlefieldSize: useBattlefieldSize,
@@ -473,7 +493,7 @@ app.get('/battles/me', function(req, res) {
 
 	if (user) {
 		Battle.findOne({
-			userId: user._id,
+			userId: user.id,
 			status: {$lte: 1}
 		}, function(err, battle) {
 			if (err) {
@@ -504,7 +524,7 @@ app.delete('/battles/me', function(req, res) {
 	
 	if (user) {
 		Battles.updateOne({
-			userId: user._id,
+			userId: user.id,
 			status: {$lte: 1}
 		}, {
 			$set: {status: 5}
@@ -588,7 +608,7 @@ app.post('/battles/:battleId', function(req, res) {
 					if (type == 'random') {
 						if (greenIds.length + 1 < maxParticipants) {
 							Battle.updateOne({battleId}, {$set: {
-									greenIds: [...greenIds, user._id]
+									greenIds: [...greenIds, user.id]
 							}}, function(err, res) {
 								if (err) {
 									res.send({
@@ -598,7 +618,7 @@ app.post('/battles/:battleId', function(req, res) {
 									})
 								} else {
 									res.send({
-										data: {...battle, greenIds: [...greenIds, user._id]},
+										data: {...battle, greenIds: [...greenIds, user.id]},
 										resultCode: 0,
 										messages: []
 									})
