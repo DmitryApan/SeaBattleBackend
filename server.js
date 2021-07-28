@@ -166,16 +166,23 @@ app.get('/auth/logout', function (req, res) {
 })
 
 app.post('/auth/register', function (req, res) {
+	const {user} = req
 	const {email, password, rememberMe} = req.body	
 
+	if (user) {
+		return res.send({
+			data: {},
+			resultCode: 1,
+			messages: ['Error']
+		})
+	}
+
 	if (!email || !password) {
-		res.send({
+		return res.send({
 			data: {},
 			resultCode: 1,
 			messages: ['Not all data']
-		})
-
-		return
+		})		
 	}
 
 	User.findOne({ email }, function (err, user) {
