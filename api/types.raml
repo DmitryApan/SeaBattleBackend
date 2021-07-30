@@ -1,0 +1,43 @@
+#%RAML 1.0 Library
+
+types:
+  Battle:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Battle id
+      userId:
+        type: string
+        description: User id who created the battle
+      type:
+        type: string
+        description: Type of distribution of participants (can be **normal** or **random**)
+      status:
+        type: integer
+        description: status of the battle (**0** - we are waiting for everyone to join,  
+          **1** - the battle is in progress,
+          **2** - victory for green,
+          **3** - victory for red,
+          **4** - draw, **5** - canceled)
+      greenIds:
+        type: string[]
+        description: array of id's of users fighting for the green side
+      redIds:
+        type: string[]
+        description: array of id's of users fighting for the red side
+      greenStatuses:
+        type: integer[]
+        description: the array of statuses of the green side is comparable to the array of id's (**0** - no shot, **1** - shot fired)
+      redStatuses:
+        type: integer[]
+        description: the array of statuses of the red side is comparable to the array of id's (**0** - no shot, **1** - shot fired)
+      maxParticipants:
+        type: integer
+        description: maximum number of participants in the battle
+      battlefieldSize:
+        type: integer
+        description: field size (length and width)
+      description:
+        type: string
+        description: short description battle
